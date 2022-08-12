@@ -1,0 +1,30 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container p {
+    width: 80%;
+    border-bottom: 1px solid gray;
+    padding: 3px;
+}
+
+.container p:hover {
+    border-bottom: 1px solid white;
+    color: gray;
+}
+
+.container button {
+    border: 0;
+    background-color: rgb(212, 101, 101);
+    color: #fff;
+    padding: 10px;
+}
+
+@media only screen and (min-width: 1200px){
+    .container p {
+        width: 90%;
+    }
+        
+}
