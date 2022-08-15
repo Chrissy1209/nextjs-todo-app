@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import styles from '../styles/Layout.module.css'
+import styles from '../style/Layout.module.css'
 import Nav from './Nav';
 
 const Layout = ({children}: any) => {

@@ -1,0 +1,24 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+.container p {
+  font-size: 0.9em;
+  text-align: left;
+}
+.container input {
+  width: 100%;
+  padding: 8px 3px;
+}
+.container button {
+  margin-bottom: 40px;
+  margin-top: 10px;
+  background-color: black;
+  color: #fff;
+  border: 0;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+}
+
+/*# sourceMappingURL=edit.module.css.map */

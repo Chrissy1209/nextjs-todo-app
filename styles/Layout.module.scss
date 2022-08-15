@@ -1,0 +1,41 @@
+.container {
+  padding: 0 2rem;
+}
+
+.main {
+  min-height: 100vh;
+  padding: 4rem 10rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  /* align-items: center; */
+}
+
+@mixin paddingSet($x) {
+  padding: 4rem $x;
+}
+
+@media only screen and (max-width: 600px){
+  .main {
+    @include paddingSet(5rem)
+  }      
+}
+
+@media only screen and (min-width: 768px){
+  .main {
+    @include paddingSet(14rem)
+  }      
+}
+
+@media only screen and (min-width: 992px){
+  .main {
+    @include paddingSet(18rem)
+  }      
+}
+
+@media only screen and (min-width: 1200px){
+  .main {
+    @include paddingSet(23rem)
+  }      
+}
