@@ -7,24 +7,29 @@
         border: 0;
         background-color: rgb(212, 101, 101);
         color: #fff;
-        padding: 10px;    
+        padding: 10px;
     }
 
+    .achieveBtn {
+        background-color: rgb(67, 70, 70);
+    }
+    
     p {
-        width: 80%;
+        width: 66%;
         border-bottom: 1px solid gray;
-        padding: 3px;    
-        &:hover {
-            border-bottom: 1px solid #fff;
-            color: gray;        
-        }
+        padding: 3px 0;    
+    }
+
+    .clickText:hover {
+        border-bottom: 1px solid #fff;
+        color: gray;        
     }
 }
 
 @media only screen and (min-width: 1200px){
     .container {
         p {
-            width: 90%;
+            width: 80%;
         }
     }
 }

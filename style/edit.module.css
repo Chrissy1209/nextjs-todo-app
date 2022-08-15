@@ -3,7 +3,7 @@
   flex-direction: column;
 }
 .container p {
-  font-size: 0.9em;
+  font-size: 16px;
   text-align: left;
 }
 .container input {

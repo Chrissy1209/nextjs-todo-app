@@ -17,8 +17,9 @@ const Edit = () => {
                 // setList((pre) => [note, ...pre])
                 try {
                     setNote('')
-                    const docRef = await addDoc(collection(db, "List"), {
-                        item: note
+                    const docRef = await addDoc(collection(db, "newList"), {
+                        item: note,
+                        status: false
                     });
                     console.log("Document written with ID: ", docRef.id);
                 } catch (e) {
