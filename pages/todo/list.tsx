@@ -1,33 +1,33 @@
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import db from '../../firebase/clientApp'
-import { doc, collection, onSnapshot, deleteDoc, query, getDocs } from "firebase/firestore";
 import styles from '../../style/list.module.css'
 import { GetServerSideProps } from "next";
+import Link from "next/link";
 
+import db from '../../firebase/clientApp'
+import { doc, collection, onSnapshot, deleteDoc, query, getDocs, setDoc } from "firebase/firestore";
+
+type listProps = {
+  id: string,
+  item: string,
+  status: boolean
+}
 const List = () => {
-    const [list, setList] = useState<string[]>([])
-    const [id, setId] = useState<string[]>([])
+    const [list, setList] = useState<listProps[]>([])
 
     const getData = useCallback(() => {
-        console.log("getData")
-        // const gettingData = async () => {
-        //     const querySnapshot = await getDocs(collection(db, "List"));
-        //     setList([])
-        //     querySnapshot.forEach((doc) => {
-        //         setList((pre) => [...pre, doc.data().item])
-        //         // console.log(doc.id);
-        //     });
-        // }   
-        // gettingData()     
-        const q = query(collection(db, "List"));
+        const q = query(collection(db, "newList"));
         onSnapshot(q, (snapshot) => {
           snapshot.docChanges().forEach((change) => {
             // console.log(snapshot.docChanges().length) // doc個數
             if (change.type === "added") {
                 console.log("New item: ", change.doc.data());
-                setList((pre) => [change.doc.data().item, ...pre])
-                setId((pre) => [change.doc.id, ...pre])
+                setList((pre) => 
+                  [{
+                    id: change.doc.id,
+                    item: change.doc.data().item,
+                    status: change.doc.data().status
+                  }, ...pre]
+                )
             }
             if (change.type === "modified") {
                 console.log("Modified item: ", change.doc.data());
@@ -37,57 +37,90 @@ const List = () => {
             }
           });
         });
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setList])
     
     useEffect(() => {
         getData() 
     }, [getData])
     
+    const handleAchieve = useCallback((index: number) => {
+      const ref = doc(db, 'newList', list[index].id)
+      setDoc(ref, { item: list[index].item, status: true })
+
+      setList([...list].map((object) => {
+        if(list[index].id === object.id) {
+        return {
+          ...object,
+          status: true
+        }
+        } else return object
+      }))
+
+    }, [list])
+
     const handleDelete = useCallback((index: number) => {
         const handlingDelete = async () => {
-            await deleteDoc(doc(db, "List", id[index]));
+            await deleteDoc(doc(db, "newList", list[index].id));
         }
         setList((pre) => {
-            return pre.filter((item, id) => index !== id)
+          return pre.filter((item, id) => index !== id)
         })
         handlingDelete()
-    }, [setList, id])
+    }, [list])
     
     return (
         <div>
             {
-              list.map((e: string, index: number) => {
-                return (
-                  <div className={styles.container} key={e+index}> 
-                      <Link href={'/todo/' + e}>
-                        <p>{e}</p>
-                      </Link>
-                      <button onClick={() => handleDelete(index)}>刪除</button>
-                  </div>
-                )
+              list.map((e: listProps, index: number) => {
+                if(!e.status) {
+                  return (
+                    <div className={styles.container} key={e.item+index}> 
+                        <Link href={'/todo/' + e.item}>
+                          <p className={styles.clickText}>{e.item}</p>
+                        </Link>
+                        <button onClick={() => handleAchieve(index)}>完成</button>
+                        <button onClick={() => handleDelete(index)}>刪除</button>
+                    </div>
+                  )
+                }
+              })
+            }
+            { list.length!==0 ? <p>完成：</p> : null }
+            {
+              list.map((e: listProps, index: number) => {
+                if(e.status) {
+                  return (
+                    <div className={styles.container} key={e.item+index}> 
+                        <p>{e.item}</p>
+                        <button className={styles.achieveBtn} disabled>完成</button>
+                        <button onClick={() => handleDelete(index)}>刪除</button>
+                    </div>
+                  )
+                }
               })
             }
         </div>
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [results, setResults] = useState<string[]>([]);
+// export const getServerSideProps: GetServerSideProps = async () => {
+//   // eslint-disable-next-line react-hooks/rules-of-hooks
+//   const [results, setResults] = useState<string[]>([]);
 
-  const querySnapshot = await getDocs(collection(db, "List"));
-  querySnapshot.forEach((doc) => {
-    setResults((pre) => [...pre, doc.data().item])
-      // console.log(doc.id);
-  });
+//   const querySnapshot = await getDocs(collection(db, "List"));
+//   querySnapshot.forEach((doc) => {
+//     setResults((pre) => [...pre, doc.data().item])
+//       // console.log(doc.id);
+//   });
 
-  console.log(results)
-  return {
-      props: {
-        results,
-      },
-  };
-};
+//   console.log(results)
+//   return {
+//       props: {
+//         results,
+//       },
+//   };
+// };
 
 export default List;
+
