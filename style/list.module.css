@@ -9,19 +9,22 @@
   color: #fff;
   padding: 10px;
 }
-.container p {
-  width: 80%;
-  border-bottom: 1px solid gray;
-  padding: 3px;
+.container .achieveBtn {
+  background-color: rgb(67, 70, 70);
 }
-.container p:hover {
+.container p {
+  width: 66%;
+  border-bottom: 1px solid gray;
+  padding: 3px 0;
+}
+.container .clickText:hover {
   border-bottom: 1px solid #fff;
   color: gray;
 }
 
 @media only screen and (min-width: 1200px) {
   .container p {
-    width: 90%;
+    width: 80%;
   }
 }
 
