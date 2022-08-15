@@ -14,7 +14,8 @@ type listProps = {
 const List = () => {
     const [list, setList] = useState<listProps[]>([])
 
-    const getData = useCallback(() => {
+    useEffect(() => {
+      const getData = () => {
         const q = query(collection(db, "newList"));
         onSnapshot(q, (snapshot) => {
           snapshot.docChanges().forEach((change) => {
@@ -37,13 +38,12 @@ const List = () => {
             }
           });
         });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setList])
-    
-    useEffect(() => {
-        getData() 
-    }, [getData])
-    
+      }
+      getData() 
+  }, [])
+
+  //-----
+
     const handleAchieve = useCallback((index: number) => {
       const ref = doc(db, 'newList', list[index].id)
       setDoc(ref, { item: list[index].item, status: true })
