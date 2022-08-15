@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import styles from '../../style/list.module.css'
-import { GetServerSideProps } from "next";
 import Link from "next/link";
-
 import db from '../../firebase/clientApp'
 import { doc, collection, onSnapshot, deleteDoc, query, getDocs } from "firebase/firestore";
+import styles from '../../styles/list.module.css'
+import { GetServerSideProps } from "next";
 
 const List = () => {
     const [list, setList] = useState<string[]>([])
@@ -21,7 +20,7 @@ const List = () => {
         //     });
         // }   
         // gettingData()     
-        const q = query(collection(db, "newList"));
+        const q = query(collection(db, "List"));
         onSnapshot(q, (snapshot) => {
           snapshot.docChanges().forEach((change) => {
             // console.log(snapshot.docChanges().length) // doc個數
@@ -38,6 +37,7 @@ const List = () => {
             }
           });
         });
+
     }, [setList])
     
     useEffect(() => {
@@ -72,22 +72,22 @@ const List = () => {
     )
 }
 
-// export const getServerSideProps: GetServerSideProps = async () => {
-//   // eslint-disable-next-line react-hooks/rules-of-hooks
-//   const [results, setResults] = useState<string[]>([]);
+export const getServerSideProps: GetServerSideProps = async () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [results, setResults] = useState<string[]>([]);
 
-//   const querySnapshot = await getDocs(collection(db, "List"));
-//   querySnapshot.forEach((doc) => {
-//     setResults((pre) => [...pre, doc.data().item])
-//       // console.log(doc.id);
-//   });
+  const querySnapshot = await getDocs(collection(db, "List"));
+  querySnapshot.forEach((doc) => {
+    setResults((pre) => [...pre, doc.data().item])
+      // console.log(doc.id);
+  });
 
-//   console.log(results)
-//   return {
-//       props: {
-//         results,
-//       },
-//   };
-// };
+  console.log(results)
+  return {
+      props: {
+        results,
+      },
+  };
+};
 
 export default List;
