@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import db from '../../firebase/clientApp'
 import { doc, collection, onSnapshot, deleteDoc, query, getDocs } from "firebase/firestore";
-import styles from '../../styles/list.module.css'
+import styles from '../../style/list.module.css'
 import { GetServerSideProps } from "next";
 
 const List = () => {
