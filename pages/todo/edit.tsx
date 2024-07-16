@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import styles from '../../style/edit.module.css'
+import styles from '../../styles/edit.module.scss'
 
 import db from '../../firebase/clientApp'
 import { collection, addDoc } from "firebase/firestore"; 

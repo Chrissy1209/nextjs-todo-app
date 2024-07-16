@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import styles from '../../style/list.module.css'
+import styles from '../../styles/list.module.scss'
 import { GetServerSideProps } from "next";
 import Link from "next/link";
 
