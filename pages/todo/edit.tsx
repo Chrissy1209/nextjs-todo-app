@@ -1,43 +1,43 @@
 import { useState, useCallback } from "react";
-import styles from '../../styles/edit.module.scss'
+import { collection, addDoc } from "firebase/firestore";
+import db from "../../firebase/clientApp";
 
-import db from '../../firebase/clientApp'
-import { collection, addDoc } from "firebase/firestore"; 
+import styles from "../../styles/edit.module.scss";
 
-const Edit = () => {
-    const [note, setNote] = useState('')
+type EditPropsType = {
+  userId: string;
+};
+const Edit = ({ userId }: EditPropsType) => {
+  const [note, setNote] = useState("");
 
-    const noteChange = useCallback((e: any) => {
-        setNote(e.target.value)
-    }, [])
+  const handleNoteChange = useCallback((e: any) => {
+    setNote(e.target.value);
+  }, []);
 
-    const handleAddItem = useCallback(() => {
-        const handleingAddItem = async () => {
-            if(note !== '') {
-                // setList((pre) => [note, ...pre])
-                try {
-                    setNote('')
-                    const docRef = await addDoc(collection(db, "newList"), {
-                        item: note,
-                        status: false
-                    });
-                    console.log("Document written with ID: ", docRef.id);
-                } catch (e) {
-                    console.error("Error adding document: ", e);
-                }
-            }
-        }
-        handleingAddItem()
-    }, [note])
+  const handleAddItem = useCallback(async () => {
+    if (note !== "") {
+      setNote("");
+      try {
+        const docRef = await addDoc(collection(db, "ToDoList"), {
+          item: note,
+          status: false,
+          userId,
+        });
+        console.log("Document written with ID: ", docRef.id);
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
+    }
+  }, [note]);
 
-    return (
-        <div className={styles.container}>
-            <p>記事：</p>
-            <input type="text" value={note} onChange={noteChange}/>
-            <br></br>
-            <button onClick={handleAddItem}>新增</button>
-        </div>
-    )
-}
+  return (
+    <div className={styles.container}>
+      <p>記事：</p>
+      <input type="text" value={note} onChange={handleNoteChange} />
+      <br />
+      <button onClick={handleAddItem}>新增</button>
+    </div>
+  );
+};
 
 export default Edit;
