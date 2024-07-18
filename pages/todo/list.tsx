@@ -81,13 +81,13 @@ const List = ({ user }: ListPropsType) => {
   );
 
   return (
-    <div>
+    <div className={styles.container}>
       {list.map((e: listType, index: number) => {
         if (!e.status) {
           return (
-            <div className={styles.container} key={e.item + index}>
+            <div className={styles.itemBox} key={e.item + index}>
               <Link href={"/todo/" + e.item}>
-                <p className={styles.clickText}>{e.item}</p>
+                <p className={styles.text}>{e.item}</p>
               </Link>
               <button onClick={() => handleAchieve(index)}>完成</button>
               <button onClick={() => handleDelete(index)}>刪除</button>
@@ -99,9 +99,9 @@ const List = ({ user }: ListPropsType) => {
       {list.map((e: listType, index: number) => {
         if (e.status) {
           return (
-            <div className={styles.container} key={e.item + index}>
+            <div className={styles.itemBox} key={e.item + index}>
               <p>{e.item}</p>
-              <button className={styles.achieveBtn} disabled>
+              <button className={styles.disabledButton} disabled>
                 完成
               </button>
               <button onClick={() => handleDelete(index)}>刪除</button>

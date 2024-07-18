@@ -1,35 +1,34 @@
 .container {
+  margin-top: 40px;
+
+  .itemBox {
     display: flex;
-    justify-content: space-between;
     align-items: center;
 
-    button {
-        border: 0;
-        background-color: rgb(212, 101, 101);
-        color: #fff;
-        padding: 10px;
-    }
-
-    .achieveBtn {
-        background-color: rgb(67, 70, 70);
-    }
-    
     p {
-        width: 66%;
-        border-bottom: 1px solid gray;
-        padding: 3px 0;    
+      width: 100%;
+      border-bottom: 1px solid gray;
+      padding: 3px 0;
+
+      &.text:hover {
+        cursor: pointer;
+        border-bottom-color: #fff;
+        color: gray;
+      }
     }
 
-    .clickText:hover {
-        border-bottom: 1px solid #fff;
-        color: gray;        
-    }
-}
+    button {
+      cursor: pointer;
+      min-width: max-content;
+      margin-left: 8px;
+      padding: 10px;
+      border: 0;
+      background-color: rgb(212, 101, 101);
+      color: #fff;
 
-@media only screen and (min-width: 1200px){
-    .container {
-        p {
-            width: 80%;
-        }
+      &.disabledButton {
+        background-color: rgb(67, 70, 70);
+      }
     }
+  }
 }

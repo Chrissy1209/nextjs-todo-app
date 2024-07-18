@@ -32,9 +32,8 @@ const Edit = ({ userId }: EditPropsType) => {
 
   return (
     <div className={styles.container}>
-      <p>記事：</p>
+      {/* <p>記事：</p> */}
       <input type="text" value={note} onChange={handleNoteChange} />
-      <br />
       <button onClick={handleAddItem}>新增</button>
     </div>
   );
