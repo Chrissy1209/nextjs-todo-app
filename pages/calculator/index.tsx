@@ -15,22 +15,23 @@ const calculator = () => {
   let [displayNumber, setDisplayNumber] = useState("0");
 
   let [method, setMethod] = useState(methodType.unset);
-  let [isOperatorClick, setIsOperatorClick] = useState(false);
+  let [isOperatorClick, setIsOperatorClick] = useState(false); // isOperatorClick will be true when ÷, x, -, +, and = is clicked.
 
   useEffect(() => {
     console.log(numbers);
   }, [numbers]);
 
+  // handle displayNumber showing, controlled by 0 ~ 9 keyboard
   const handleKeyboardClick = useCallback(
     (e: string) => {
-      if (displayNumber === "0") setDisplayNumber(e);
-      else if (displayNumber === "-0") {
+      if (displayNumber === "0") setDisplayNumber(e); // 0 -> 1
+      else if (displayNumber === "-0") { // -0 -> -1
         setDisplayNumber("-" + e);
         setIsOperatorClick(false);
-      } else if (isOperatorClick) {
+      } else if (isOperatorClick) { // if previous step is operator(OperatorClick = true), store previous dNumber(handled by handleOeratorClick) and start a new one.
         setDisplayNumber(e);
         setIsOperatorClick(false);
-      } else setDisplayNumber((pre) => pre + e);
+      } else setDisplayNumber((pre) => pre + e); // in normal cases, add clicke number to displayNumber: 1 -> 12
     },
     [isOperatorClick, displayNumber]
   );
@@ -42,49 +43,44 @@ const calculator = () => {
     setIsOperatorClick(false);
   }, []);
 
-  const handleSignClick = useCallback(() => {
-    if (isOperatorClick) {
-      setDisplayNumber("-0");
-      return;
-    }
-
+  // handle plus and minus sign toggle
+  const handleToggleSignClick = useCallback(() => {
     if (displayNumber === "0") setDisplayNumber("-0");
     else if (displayNumber === "-0") setDisplayNumber("0");
+    else if (isOperatorClick && numbers[1] === "") setDisplayNumber("-0"); // if previous steps is operator(isOperatorClick = true) and NOT being submit, start a new minus dNumber -> -0
     else setDisplayNumber((pre) => String(Number(pre) * -1));
-  }, [displayNumber, isOperatorClick]);
+    // p.s. submit will store the displayNumber to numbers[1], which is using to continuous submit process.
+  }, [displayNumber, isOperatorClick, numbers]);
 
   const handlePercentageClick = useCallback(() => {
     setDisplayNumber((pre) => String(Number(pre) / 100));
   }, []);
 
+  // handle displayNumber and numbers[], controlled by operator
   const handleOeratorClick = useCallback(
     (med: string) => {
       setMethod(med);
-      // if (isOperatorClick) return;
-      // if (isOperatorClick && med === method) return; //FIXME: 3 ++++++ -> 3 not 27
-
-      if (numbers[0] === "" || numbers[1] !== "") {
-        setNumbers(([_, pre]) => [displayNumber, pre]);
+      // if (isOperatorClick && med === method) return; //FIXME: 3 ++++ should still be 3, not 15
+      
+      if (numbers[0] === "" || numbers[1] !== "") { // if init state(numbers[0] === "") or previous step is submit(numbers[1] !== ""), store displayNumber to numbers[0] and reset number[1] to "".
+        setNumbers([displayNumber, ""]);
       } else {
         let value = handleCalculat();
         setNumbers(([_, pre]) => [String(value), pre]);
       }
-      setNumbers(([pre, _]) => [pre, ""]);
       setIsOperatorClick(true);
     },
-    [isOperatorClick, method, numbers, displayNumber]
+    [numbers, displayNumber]
   );
 
+  // handle submit(=) click
   const handleSubmitClick = useCallback(() => {
-    setIsOperatorClick(true);
-
-    if (numbers[1] === "") {
-      setNumbers(([pre, _]) => [pre, displayNumber]);
-
+    if (numbers[1] === "") { // using number[0] and displayNumber to calculate
       let value = handleCalculat();
       setNumbers(([_, pre]) => [String(value), pre]);
       setDisplayNumber(String(value));
-    } else {
+      setNumbers(([pre, _]) => [pre, displayNumber]); // store the displayNumber to numbers[1], which is using to continuous submit process.
+    } else { // if numbers[1] !== "", which means user continuous click submit. using displayNumber and number[1] to calculate  
       let calculateNumber = Number(displayNumber);
       switch (method) {
         case methodType.divide:
@@ -102,12 +98,14 @@ const calculator = () => {
         default:
           break;
       }
+      calculateNumber = parseFloat(calculateNumber.toFixed(5));
       setDisplayNumber(String(calculateNumber));
       setNumbers(([_, pre]) => [String(calculateNumber), pre]);
     }
   }, [method, numbers, displayNumber]);
 
-  const handleCalculat = () => {
+  // handle calculation, which called by handleOeratorClick and handleSubmitClick(if numbers[1] === "")
+  const handleCalculat = useCallback(() => {
     let calculateNumber = Number(numbers[0]);
     switch (method) {
       case methodType.divide:
@@ -125,8 +123,8 @@ const calculator = () => {
       default:
         break;
     }
-    return calculateNumber;
-  };
+    return parseFloat(calculateNumber.toFixed(5));
+  }, [numbers, method, displayNumber]);
 
   return (
     <div className={styles.container}>
@@ -143,7 +141,7 @@ const calculator = () => {
           </div>
           <div
             className={`${styles.item} ${styles.lightgray}`}
-            onClick={handleSignClick}
+            onClick={handleToggleSignClick}
           >
             +/-
           </div>
