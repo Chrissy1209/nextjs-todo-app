@@ -28,7 +28,7 @@ const Home: NextPage = () => {
         console.log(errorCode);
         console.log(errorMessage);
       });
-  }, []);
+  }, [auth]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -38,7 +38,7 @@ const Home: NextPage = () => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [auth]);
 
   return (
     <>

@@ -34,7 +34,7 @@ const List = ({ user }: ListPropsType) => {
         const changes = snapshot.docChanges();
         changes.forEach((change) => {
           const data = change.doc.data();
-          if (data.userId === user.uid) {
+          if (data.userId === user?.uid) {
             if (change.type === "added") {
               newList = [
                 { id: change.doc.id, item: data.item, status: data.status },
@@ -66,10 +66,10 @@ const List = ({ user }: ListPropsType) => {
       await setDoc(ref, {
         item: list[index].item,
         status: true,
-        userId: user.uid,
+        userId: user?.uid,
       });
     },
-    [list]
+    [list, user?.uid]
   );
 
   const handleDelete = useCallback(

@@ -10,7 +10,7 @@ const methodType = {
   unset: "unset",
 };
 
-const calculator = () => {
+const Calculator = () => {
   let [numbers, setNumbers] = useState<string[]>(["", ""]);
   let [displayNumber, setDisplayNumber] = useState("0");
 
@@ -231,4 +231,4 @@ const calculator = () => {
   );
 };
 
-export default calculator;
+export default Calculator;

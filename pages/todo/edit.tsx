@@ -28,7 +28,7 @@ const Edit = ({ userId }: EditPropsType) => {
         console.error("Error adding document: ", e);
       }
     }
-  }, [note]);
+  }, [note, userId]);
 
   return (
     <div className={styles.container}>
