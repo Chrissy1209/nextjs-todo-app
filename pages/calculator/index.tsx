@@ -13,9 +13,11 @@ const methodType = {
 const Calculator = () => {
   let [numbers, setNumbers] = useState<string[]>(["", ""]);
   let [displayNumber, setDisplayNumber] = useState("0");
-
   let [method, setMethod] = useState(methodType.unset);
-  let [isOperatorClick, setIsOperatorClick] = useState(false); // isOperatorClick will be true when ÷, x, -, +, and = is clicked.
+  // isOperatorClick will be true when ÷, x, -, +, and = is clicked.
+  let [isOperatorClick, setIsOperatorClick] = useState(false); 
+  // isOperatorOccupied will be true when ÷, x, -, + is clicked.
+  let [isOperatorOccupied, setIsOperatorOccupied] = useState(false); 
 
   useEffect(() => {
     console.log(numbers);
@@ -28,9 +30,11 @@ const Calculator = () => {
       else if (displayNumber === "-0") { // -0 -> -1
         setDisplayNumber("-" + e);
         setIsOperatorClick(false);
-      } else if (isOperatorClick) { // if previous step is operator(OperatorClick = true), store previous dNumber(handled by handleOeratorClick) and start a new one.
+      } else if (isOperatorClick) {
+        // if previous step is operator(OperatorClick = true), store previous dNumber(handled by handleOperatorClick) and start a new one.
         setDisplayNumber(e);
         setIsOperatorClick(false);
+        setIsOperatorOccupied(false);
       } else setDisplayNumber((pre) => pre + e); // in normal cases, add clicke number to displayNumber: 1 -> 12
     },
     [isOperatorClick, displayNumber]
@@ -41,90 +45,103 @@ const Calculator = () => {
     setNumbers(["", ""]);
     setMethod(methodType.unset);
     setIsOperatorClick(false);
+    setIsOperatorOccupied(false);
   }, []);
 
   // handle plus and minus sign toggle
   const handleToggleSignClick = useCallback(() => {
     if (displayNumber === "0") setDisplayNumber("-0");
     else if (displayNumber === "-0") setDisplayNumber("0");
-    else if (isOperatorClick && numbers[1] === "") setDisplayNumber("-0"); // if previous steps is operator(isOperatorClick = true) and NOT being submit, start a new minus dNumber -> -0
+    else if (isOperatorClick && numbers[1] === "") setDisplayNumber("-0"); // if previous steps is operator(isOperatorClick = true) and NOT yet submited, start a new minus dNumber -> -0
     else setDisplayNumber((pre) => String(Number(pre) * -1));
-    // p.s. submit will store the displayNumber to numbers[1], which is using to continuous submit process.
+    // p.s. submit will store the displayNumber to numbers[1], which is used to continuous submit process.
   }, [displayNumber, isOperatorClick, numbers]);
 
-  const handlePercentageClick = useCallback(() => {
-    setDisplayNumber((pre) => String(Number(pre) / 100));
-  }, []);
+  const handlePercentageClick = useCallback(() => { // TODO: up to 12 digits
+    // display section is up to 12 digits
+    // e.g. 33.3333 / 100 = 0.3333..
+    const num = Number(displayNumber) / 100;
+    console.log(num);
+    const length = String(num).length;
+    if (length > 13) setDisplayNumber(String(num.toExponential(2)));
+    else setDisplayNumber(String(num));
+  
+    // if (num.toFixed(12 - length) === "0.000000000") setDisplayNumber(String(num));
+    // else setDisplayNumber(String(num.toFixed(12 - length)));
+  }, [displayNumber]);
 
-  // handle displayNumber and numbers[], controlled by operator
-  const handleOeratorClick = useCallback(
-    (med: string) => {
-      setMethod(med);
-      // if (isOperatorClick && med === method) return; //FIXME: 3 ++++ should still be 3, not 15
-      
-      if (numbers[0] === "" || numbers[1] !== "") { // if init state(numbers[0] === "") or previous step is submit(numbers[1] !== ""), store displayNumber to numbers[0] and reset number[1] to "".
-        setNumbers([displayNumber, ""]);
-      } else {
-        let value = handleCalculat();
-        setNumbers(([_, pre]) => [String(value), pre]);
-      }
-      setIsOperatorClick(true);
-    },
-    [numbers, displayNumber]
-  );
-
-  // handle submit(=) click
-  const handleSubmitClick = useCallback(() => {
-    if (numbers[1] === "") { // using number[0] and displayNumber to calculate
-      let value = handleCalculat();
-      setNumbers(([_, pre]) => [String(value), pre]);
-      setDisplayNumber(String(value));
-      setNumbers(([pre, _]) => [pre, displayNumber]); // store the displayNumber to numbers[1], which is using to continuous submit process.
-    } else { // if numbers[1] !== "", which means user continuous click submit. using displayNumber and number[1] to calculate  
-      let calculateNumber = Number(displayNumber);
-      switch (method) {
+    // handle calculation, which called by handleOperatorClick and handleSubmitClick(if numbers[1] === "")
+    const calculateResult = useCallback(
+      (num1: number, num2: number, med: string) => {
+      let result = num1;
+      switch (med) {
         case methodType.divide:
-          calculateNumber /= Number(numbers[1]);
+          result /= num2;
           break;
         case methodType.multiply:
-          calculateNumber *= Number(numbers[1]);
+          result *= num2;
           break;
         case methodType.subtract:
-          calculateNumber -= Number(numbers[1]);
+          result -= num2;
           break;
         case methodType.add:
-          calculateNumber += Number(numbers[1]);
+          result += num2;
           break;
         default:
           break;
       }
-      calculateNumber = parseFloat(calculateNumber.toFixed(5));
-      setDisplayNumber(String(calculateNumber));
-      setNumbers(([_, pre]) => [String(calculateNumber), pre]);
-    }
-  }, [method, numbers, displayNumber]);
+      // display section is up to 12 digits
+      const integerPartLength  = String(Math.floor(result)).length;
+      
+      // if integerPartLength > 12, convert to scientific notation
+      if (integerPartLength > 12) {
+        return result.toExponential(2);
+      } else {
+        // else, e.g. 33.3333333...
+        const decimalPlaces = 12 - integerPartLength;
+        return parseFloat(result.toFixed(decimalPlaces));
+      }
+    }, []);
 
-  // handle calculation, which called by handleOeratorClick and handleSubmitClick(if numbers[1] === "")
-  const handleCalculat = useCallback(() => {
-    let calculateNumber = Number(numbers[0]);
-    switch (method) {
-      case methodType.divide:
-        calculateNumber /= Number(displayNumber);
-        break;
-      case methodType.multiply:
-        calculateNumber *= Number(displayNumber);
-        break;
-      case methodType.subtract:
-        calculateNumber -= Number(displayNumber);
-        break;
-      case methodType.add:
-        calculateNumber += Number(displayNumber);
-        break;
-      default:
-        break;
+  // handle displayNumber and numbers[], controlled by operator
+  const handleOperatorClick = useCallback(
+    (med: string) => {
+      setMethod(med);
+      if(isOperatorOccupied) return;
+      
+      if (numbers[0] === "" || numbers[1] !== "") {
+        // if init state(numbers[0] === "") or previous step is submit(numbers[1] !== ""), store displayNumber to numbers[0] and reset number[1] to "".
+        setNumbers([displayNumber, ""]);
+      } else {
+        // continuous operator process
+        const value = calculateResult(Number(numbers[0]), Number(displayNumber), method);
+        setNumbers(([_, pre]) => [String(value), pre]);
+      }
+      setIsOperatorClick(true);
+      setIsOperatorOccupied(true);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [numbers, displayNumber, isOperatorOccupied, calculateResult]
+  );
+
+  // handle submit(=) click
+  const handleSubmitClick = useCallback(() => {
+    setIsOperatorOccupied(false);
+    if (numbers[1] === "") {
+      // using number[0] and displayNumber to calculate
+      const value = calculateResult(Number(numbers[0]), Number(displayNumber), method);
+      setDisplayNumber(String(value));
+
+      // store the displayNumber to numbers[1], which is using to continuous submit process.
+      setNumbers([String(value), displayNumber]); 
+    } else {
+      // if numbers[1] !== "", which means user continuous click submit. using displayNumber and number[1] to calculate  
+      const value = calculateResult(Number(displayNumber), Number(numbers[1]), method);
+      setDisplayNumber(String(value));
+
+      setNumbers(([_, pre]) => [String(value), pre]);
     }
-    return parseFloat(calculateNumber.toFixed(5));
-  }, [numbers, method, displayNumber]);
+  }, [method, numbers, displayNumber, calculateResult]);
 
   return (
     <div className={styles.container}>
@@ -152,10 +169,8 @@ const Calculator = () => {
             %
           </div>
           <div
-            className={`${styles.item} ${styles.operator} ${
-              method === methodType.divide && styles.action
-            }`}
-            onClick={() => handleOeratorClick(methodType.divide)}
+            className={`${styles.item} ${styles.operator}`}
+            onClick={() => handleOperatorClick(methodType.divide)}
           >
             ÷
           </div>
@@ -169,10 +184,8 @@ const Calculator = () => {
             9
           </div>
           <div
-            className={`${styles.item} ${styles.operator} ${
-              method === methodType.multiply && styles.action
-            }`}
-            onClick={() => handleOeratorClick(methodType.multiply)}
+            className={`${styles.item} ${styles.operator}`}
+            onClick={() => handleOperatorClick(methodType.multiply)}
           >
             x
           </div>
@@ -186,10 +199,8 @@ const Calculator = () => {
             6
           </div>
           <div
-            className={`${styles.item} ${styles.operator} ${
-              method === methodType.subtract && styles.action
-            }`}
-            onClick={() => handleOeratorClick(methodType.subtract)}
+            className={`${styles.item} ${styles.operator}`}
+            onClick={() => handleOperatorClick(methodType.subtract)}
           >
             -
           </div>
@@ -203,10 +214,8 @@ const Calculator = () => {
             3
           </div>
           <div
-            className={`${styles.item} ${styles.operator} ${
-              method === methodType.add && styles.action
-            }`}
-            onClick={() => handleOeratorClick(methodType.add)}
+            className={`${styles.item} ${styles.operator}`}
+            onClick={() => handleOperatorClick(methodType.add)}
           >
             +
           </div>
@@ -218,9 +227,7 @@ const Calculator = () => {
           </div>
           <div className={styles.item}>.</div>
           <div
-            className={`${styles.item} ${styles.operator} ${
-              method === methodType.submit && styles.action
-            }`}
+            className={`${styles.item} ${styles.operator}`}
             onClick={handleSubmitClick}
           >
             =

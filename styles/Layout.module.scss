@@ -16,7 +16,7 @@
 
 @media only screen and (max-width: 600px) {
   .main {
-    @include paddingSet(5rem);
+    @include paddingSet(4rem);
   }
 }
 

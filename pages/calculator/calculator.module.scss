@@ -17,7 +17,7 @@
       align-items: flex-end;
       justify-content: flex-end;
       overflow: hidden;
-      padding: 4px;
+      padding: 4px 0;
       min-height: 100px;
       font-size: 42px;
     }
@@ -53,12 +53,6 @@
           font-size: 20px;
           background-color: rgb(255, 165, 0);
           
-          &.action {
-            background-color: rgb(255, 255, 255);
-            color: rgb(255, 165, 0);
-            transition: background-color 0.5s linear;
-          }
-
           &:active {
             background-color: rgb(255, 210, 128);
           }
